@@ -44,6 +44,7 @@ function getClanMembers($db, $id=""){
     $sql = "SELECT * FROM clan_members";
     $sql .= " WHERE clan_id = '$id' AND townhall > '8' ";
     $sql .= " ORDER BY townhall DESC";
+    echo $sql;
     $res = $db->query($sql);
     while($row = $res->fetch_assoc()){
         $return[] = $row;
