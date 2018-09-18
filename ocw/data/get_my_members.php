@@ -2,8 +2,6 @@
 require(dirname(dirname(__FILE__))."/includes.php");
 
 $mymembers = getClanMembers($con, $_SESSION['my_clan']['clan_id']);
-echo "<pre>";
-print_r($mymembers);
 $s = array();
 $s['data'] = $mymembers;
 
