@@ -35,11 +35,12 @@ $_SESSION['my_clan'] = $myclan;
 
 <div class="container">
   <h2><?php echo $myclan['clan_name'];?></h2>
+  <center><div id="result"></div></center>
   <ul class="nav nav-tabs">
     <li><a href="/ocw">Home</a></li>
     <li class="active"><a data-toggle="tab" href="#mymembers">My Members</a></li>
-    <li><a data-toggle="tab" href="#addplayer">Search Player</a></li>
-    <li><a data-toggle="tab" href="#roster">View Roster</a></li>
+    <li><a data-toggle="tab" href="#addplayer"  id="addplayers">Search Player</a></li>
+    <li><a data-toggle="tab" href="#roster" id="viewRoster">View Roster</a></li>
   </ul>
 
   <div class="tab-content">
@@ -65,21 +66,37 @@ $_SESSION['my_clan'] = $myclan;
 		<p>Select a member to be added to your roster.</p>
         <p>Press <b>Submit</b> and the members will added to your ocw roster.</p>
         <p><button>Submit</button></p>
-        <b>Data submitted to the server:</b><br>
-        <pre id="example-console">
-        </pre>
     	</form>
     </div>
     <div id="addplayer" class="tab-pane fade">
       <h3>Search/Add Player to your roster.</h3>
-      <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p>Select a player to be added to your roster.</p>
+        <p>Press <b>Add</b> and the player(s) will added to your ocw roster.</p>
+      
+      <form id="frm-search-player" action="/ocw/data/add_roster_search.php" method="POST">
+      
+      
+      <!-- Textarea -->
+    <div class="form-group">
+      <div class="col-md-4">                 
+      <label class="col-md-4 control-label" for="textarea">Player Tag(s)</label>    
+        <textarea class="form-control" id="textarea" name="textarea"></textarea>
+        <p> (Max of 10 entries per search.)</p>
+        <br/>
+        <button id="searchBtn" name="searchBtn" class="btn btn-success">Search</button>
+        <br/>
+      </div>
     </div>
-    <div id="roster" class="tab-pane fade">
-      <h3>My Roster</h3>
-      <table id="myTable2" class="table table-striped table-bordered" cellspacing="0" width="100%">
+  	<div class="form-group">
+      <div class="col-sm-12">
+        &nbsp;
+      </div>
+	</div>
+      
+      <table id="myTable3" class="table table-striped table-bordered" cellspacing="0" width="100%">
         <thead>
             <tr>
-                <th><input type="checkbox" name="select_all" value="1" id="example-select-all2" style="vertical-align: middle"></th>
+            	<th><input type="checkbox" name="select_all" value="1" id="table3-select-all" style="vertical-align: middle"></th>
                 <th>PLAYER NAME</th>
                 <th>PLAYER TAG</th>
                 <th>TH LEVEL</th>
@@ -89,16 +106,47 @@ $_SESSION['my_clan'] = $myclan;
             </tr>
         </thead>
     </table>
+      
+      <hr>
+		<p>Select a player to be added to your roster.</p>
+        <p>Press <b>Add</b> and the player(s) will added to your ocw roster.</p>
+        <p><button>Add</button></p>
+    </form>
+      
+    </div>
+    <div id="roster" class="tab-pane fade">
+      <h3>My Roster</h3>
+      <p>Select a member to be remove from your roster.</p>
+		<p>Press <b>Remove</b> and the member(s) will be deleted.</p>
+		<p>Press <b>Copy</b> to copy the data and paste it in spreadsheet.</p>
+		<p>Press <b>Csv</b> to export the data in csv format.</p>
+		<p>Press <b>Excel</b> to export the data spreadsheet format.</p>
+		<p>Once you Copy or Exported the Data you can now paste it the OCW Roster Sheet.</p>
+		<form id="frm-table2" action="/ocw/data/remove_roster.php" method="POST">
+      <table id="myTable2" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th><input type="checkbox" name="select_all" value="1" id="select-all-table2" style="vertical-align: middle"></th>
+                <th>PLAYER NAME</th>
+                <th>PLAYER TAG</th>
+                <th>TH LEVEL</th>
+                <th>AQ</th>
+                <th>BK</th>
+                <th>WARDEN</th>
+            </tr>
+        </thead>
+    </table>
+    <hr>
+		<p>Select a member to be remove from your roster.</p>
+		<p>Press <b>Remove</b> and the member(s) will be deleted.</p>
+        <p><button>Remove</button></p>
+        </form>
     </div>
   </div>
 </div>
 <script type="text/javascript">
 
 $(document).ready(function() {
-
-
-
-	
 	var table = $('#myTable1').DataTable( {
         "processing": true,
         "ajax": "data/get_my_members.php",
@@ -168,6 +216,32 @@ $(document).ready(function() {
                      { "data": "gw" }
                  ]
     } );
+
+	var table3 = $('#myTable3').DataTable( {
+        "processing": true,
+        "ajax": "data/get_search_data.php",
+        'order': [[1, 'asc']],
+        'columnDefs': [{
+            'targets': 0,
+            'searchable': false,
+            'orderable': false,
+            'className': 'dt-body-center',
+            'render': function (data, type, full, meta){
+                return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+            }
+         }],
+         "columns": [
+                     { "data": "player_tag" },
+                     { "data": "name" },
+                     { "data": "player_tag" },
+                     { "data": "townhall" },
+                     { "data": "aq" },
+                     { "data": "bk" },
+                     { "data": "gw" }
+                 ]
+    } );
+
+    
 	// Handle click on "Select all" control
 	   $('#example-select-all').on('click', function(){
 	      // Get all rows with search applied
@@ -189,10 +263,9 @@ $(document).ready(function() {
 	         }
 	      }
 	   });
-
 	   // Handle form submission event
 	   $('#frm-example').on('submit', function(e){
-	      var form = this;
+	      var form = $(this);
 
 	      // Iterate over all checkboxes in the table
 	      table.$('input[type="checkbox"]').each(function(){
@@ -210,22 +283,199 @@ $(document).ready(function() {
 	            }
 	         }
 	      });
-
-	   // FOR TESTING ONLY
-	      
-	      // Output form data to a console
-// 	      $('#example-console').text($(form).serialize()); 
-// 	      console.log("Form submission", $(form).serialize()); 
-	       
-// 	      // Prevent actual form submission
-// 	      e.preventDefault();
-	      
+	      e.preventDefault();
+	      var url = form.attr('action');
+	      $.ajax({
+	           type: "POST",
+	           url: url,
+	           data: form.serialize(), // serializes the form's elements.
+	           success: function(data)
+	           {
+	        	   $("#result").html('<div class="alert alert-success"><button type="button" class="close">×</button>Successfully updated record!</div>');
+	               window.setTimeout(function() {
+	                     $(".alert").fadeTo(500, 0).slideUp(500, function(){
+	                         $(this).remove(); 
+	                     });
+	                 }, 5000);
+	               $('.alert .close').on("click", function(e){
+	                     $(this).parent().fadeTo(500, 0).slideUp(500);
+	                  });
+	           }
+	         });
+	    	
 	   });
 
+		// Handle click on "Select all" control
+	   $('#select-all-table2').on('click', function(){
+	      // Get all rows with search applied
+	      var rows = table2.rows({ 'search': 'applied' }).nodes();
+	      // Check/uncheck checkboxes for all rows in the table
+	      $('input[type="checkbox"]', rows).prop('checked', this.checked);
+	   });
+
+	   // Handle click on checkbox to set state of "Select all" control
+	   $('#myTable2 tbody').on('change', 'input[type="checkbox"]', function(){
+	      // If checkbox is not checked
+	      if(!this.checked){
+	         var el = $('#select-all-table2').get(0);
+	         // If "Select all" control is checked and has 'indeterminate' property
+	         if(el && el.checked && ('indeterminate' in el)){
+	            // Set visual state of "Select all" control
+	            // as 'indeterminate'
+	            el.indeterminate = true;
+	         }
+	      }
+	   });
+	   
+	   // Handle form submission event
+	   $('#frm-table2').on('submit', function(e){
+	      var form = $(this);
+
+	      // Iterate over all checkboxes in the table
+	      table2.$('input[type="checkbox"]').each(function(){
+	         // If checkbox doesn't exist in DOM
+	         if(!$.contains(document, this)){
+	            // If checkbox is checked
+	            if(this.checked){
+	               // Create a hidden element
+	               $(form).append(
+	                  $('<input>')
+	                     .attr('type', 'hidden')
+	                     .attr('name', this.name)
+	                     .val(this.value)
+	               );
+	            }
+	         }
+	      });
+	      
+	      e.preventDefault();
+	      var url = form.attr('action');
+	      $.ajax({
+	           type: "POST",
+	           url: url,
+	           data: form.serialize(), // serializes the form's elements.
+	           success: function(data)
+	           {
+	        	   $('#viewRoster').click();
+	        	   $("#result").html('<div class="alert alert-success"><button type="button" class="close">×</button>Successfully updated record!</div>');
+	               window.setTimeout(function() {
+	                     $(".alert").fadeTo(500, 0).slideUp(500, function(){
+	                         $(this).remove(); 
+	                     });
+	                 }, 5000);
+	               $('.alert .close').on("click", function(e){
+	                     $(this).parent().fadeTo(500, 0).slideUp(500);
+	                  });
+	           }
+	         });
+	   });
+
+	   $('#viewRoster').click(function(){
+		   $(this).addClass('fa-spin');
+		   var el = $(this);
+		   table2.ajax.reload(function() {
+		       el.removeClass('fa-spin');
+		   });
+		});
 
 
+	   $('#addplayers').click(function(){
+		   $(this).addClass('fa-spin');
+		   var el = $(this);
+		   table3.ajax.reload(function() {
+		       el.removeClass('fa-spin');
+		   });
+		});
+
+		$("#searchBtn").click(function(e){
+			e.preventDefault();
+
+		   $.ajax({
+	           type: "POST",
+	           url: "/ocw/data/search_data.php",
+	           data: "searches="+$("textarea").val(), // serializes the form's elements.
+	           success: function(data)
+	           {
+	        	   $('#addplayers').click();
+	        	   $("#result").html('<div class="alert alert-success"><button type="button" class="close">×</button>Successfully updated record!</div>');
+	               window.setTimeout(function() {
+	                     $(".alert").fadeTo(500, 0).slideUp(500, function(){
+	                         $(this).remove(); 
+	                     });
+	                 }, 5000);
+	               $('.alert .close').on("click", function(e){
+	                     $(this).parent().fadeTo(500, 0).slideUp(500);
+	                  });
+	           }
+	         });
+		   
+		});
 
 
+		// Handle click on "Select all" control
+		   $('#table3-select-all').on('click', function(){
+		      // Get all rows with search applied
+		      var rows = table3.rows({ 'search': 'applied' }).nodes();
+		      // Check/uncheck checkboxes for all rows in the table
+		      $('input[type="checkbox"]', rows).prop('checked', this.checked);
+		   });
+
+		   // Handle click on checkbox to set state of "Select all" control
+		   $('#myTable3 tbody').on('change', 'input[type="checkbox"]', function(){
+		      // If checkbox is not checked
+		      if(!this.checked){
+		         var el = $('#table3-select-all').get(0);
+		         // If "Select all" control is checked and has 'indeterminate' property
+		         if(el && el.checked && ('indeterminate' in el)){
+		            // Set visual state of "Select all" control
+		            // as 'indeterminate'
+		            el.indeterminate = true;
+		         }
+		      }
+		   });
+		   // Handle form submission event
+		   $('#frm-search-player').on('submit', function(e){
+		      var form = $(this);
+
+		      // Iterate over all checkboxes in the table
+		      table.$('input[type="checkbox"]').each(function(){
+		         // If checkbox doesn't exist in DOM
+		         if(!$.contains(document, this)){
+		            // If checkbox is checked
+		            if(this.checked){
+		               // Create a hidden element
+		               $(form).append(
+		                  $('<input>')
+		                     .attr('type', 'hidden')
+		                     .attr('name', this.name)
+		                     .val(this.value)
+		               );
+		            }
+		         }
+		      });
+		      e.preventDefault();
+		      var url = form.attr('action');
+		      $.ajax({
+		           type: "POST",
+		           url: url,
+		           data: form.serialize(), // serializes the form's elements.
+		           success: function(data)
+		           {
+		        	   $('#addplayer').click();
+		        	   $("#result").html('<div class="alert alert-success"><button type="button" class="close">×</button>Successfully updated record!</div>');
+		               window.setTimeout(function() {
+		                     $(".alert").fadeTo(500, 0).slideUp(500, function(){
+		                         $(this).remove(); 
+		                     });
+		                 }, 5000);
+		               $('.alert .close').on("click", function(e){
+		                     $(this).parent().fadeTo(500, 0).slideUp(500);
+		                  });
+		           }
+		         });
+		    	
+		   });
+		
     
 } );
 

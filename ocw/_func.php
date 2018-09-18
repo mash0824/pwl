@@ -85,13 +85,27 @@ function addtoRoster($data){
 
 function removeRoster($data) {
     $myroster = (!isset($_SESSION['roster'][$_SESSION['my_clan']['clan_id']]) ? array() : $_SESSION['roster'][$_SESSION['my_clan']['clan_id']]);
-    unset($myroster[$data['player_tag']]);
+    unset($myroster[$data]);
     $_SESSION['roster'][$_SESSION['my_clan']['clan_id']] = $myroster;
 }
 
 function getRoster(){
     $s = array();
     $myroster = (!isset($_SESSION['roster'][$_SESSION['my_clan']['clan_id']]) ? array() : $_SESSION['roster'][$_SESSION['my_clan']['clan_id']]);
+    if(empty($myroster)) {
+        $s['data'] = array();
+    }
+    else {
+        $s['data'] = $myroster;
+        sort($s['data']);
+    }
+    
+    return $s;
+}
+
+function getSearchData(){
+    $s = array();
+    $myroster = (!isset($_SESSION['search_results'][$_SESSION['my_clan']['clan_id']]) ? array() : $_SESSION['search_results'][$_SESSION['my_clan']['clan_id']]);
     if(empty($myroster)) {
         $s['data'] = array();
     }
